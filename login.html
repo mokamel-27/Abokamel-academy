@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تسجيل الدخول | أكاديمية أبو كامل</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site">
+  <div class="brand">أكاديمية <span>أبو كامل</span></div>
+  <nav class="site"><a href="index.html">الرئيسية</a></nav>
+</header>
+
+<main>
+  <div class="panel-box">
+    <h2 id="form-title">تسجيل الدخول</h2>
+    <p class="sub" id="form-sub">ادخل بياناتك عشان تكمل متابعة الدروس</p>
+
+    <form id="auth-form">
+      <label for="email">البريد الإلكتروني</label>
+      <input type="email" id="email" required autocomplete="email">
+
+      <label for="password">كلمة المرور</label>
+      <input type="password" id="password" required autocomplete="current-password" minlength="6">
+
+      <button type="submit" class="primary" id="submit-btn">دخول</button>
+    </form>
+
+    <div class="msg" id="msg-box"></div>
+
+    <div class="switch-link">
+      <span id="switch-text">لسه معندكش حساب؟</span>
+      <a href="#" id="switch-link">اعمل حساب جديد</a>
+    </div>
+  </div>
+</main>
+
+<footer class="site">أكاديمية أبو كامل — محتوى تعليمي للمعهد الفني الصناعي</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script>
+let mode = "login"; // أو "signup"
+
+const title = document.getElementById("form-title");
+const sub = document.getElementById("form-sub");
+const submitBtn = document.getElementById("submit-btn");
+const switchText = document.getElementById("switch-text");
+const switchLink = document.getElementById("switch-link");
+const msgBox = document.getElementById("msg-box");
+const form = document.getElementById("auth-form");
+
+switchLink.addEventListener("click", function (e) {
+  e.preventDefault();
+  mode = mode === "login" ? "signup" : "login";
+  if (mode === "signup") {
+    title.textContent = "إنشاء حساب جديد";
+    sub.textContent = "سجّل عشان تحفظ تقدمك في الدروس";
+    submitBtn.textContent = "إنشاء الحساب";
+    switchText.textContent = "عندك حساب بالفعل؟";
+    switchLink.textContent = "سجّل دخولك";
+  } else {
+    title.textContent = "تسجيل الدخول";
+    sub.textContent = "ادخل بياناتك عشان تكمل متابعة الدروس";
+    submitBtn.textContent = "دخول";
+    switchText.textContent = "لسه معندكش حساب؟";
+    switchLink.textContent = "اعمل حساب جديد";
+  }
+  msgBox.className = "msg";
+});
+
+function showMsg(text, type) {
+  msgBox.textContent = text;
+  msgBox.className = "msg " + type;
+}
+
+form.addEventListener("submit", function (e) {
+  e.preventDefault();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  const action = mode === "login"
+    ? auth.signInWithEmailAndPassword(email, password)
+    : auth.createUserWithEmailAndPassword(email, password);
+
+  action
+    .then(function (cred) {
+      if (mode === "signup") {
+        // نخزن بيانات أساسية للطالب في Firestore
+        return db.collection("students").doc(cred.user.uid).set({
+          email: email,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }
+    })
+    .then(function () {
+      window.location.href = "index.html";
+    })
+    .catch(function (err) {
+      showMsg(translateError(err.code), "error");
+    });
+});
+
+function translateError(code) {
+  const map = {
+    "auth/email-already-in-use": "الإيميل ده مسجل بحساب قبل كده",
+    "auth/invalid-email": "صيغة الإيميل مش صح",
+    "auth/weak-password": "كلمة المرور لازم تكون 6 حروف على الأقل",
+    "auth/user-not-found": "مفيش حساب بالإيميل ده",
+    "auth/wrong-password": "كلمة المرور غلط",
+    "auth/invalid-credential": "البيانات اللي دخلتها غلط"
+  };
+  return map[code] || "حصل خطأ، حاول تاني";
+}
+</script>
+</body>
+</html>

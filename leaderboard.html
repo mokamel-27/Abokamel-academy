@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>الترتيب | أكاديمية أبو كامل</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-protected>
+
+<header class="site">
+  <div class="brand">أكاديمية <span>أبو كامل</span></div>
+  <nav class="site">
+    <a href="index.html">الرئيسية</a>
+    <span id="nav-user" style="display:none;font-family:'IBM Plex Mono',monospace;font-size:.8rem;color:#d98e2b;"></span>
+    <a href="#" id="nav-logout" onclick="logout()" style="display:none">خروج</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <h1 id="lb-title">—</h1>
+    <p style="color:#5b6b64">أفضل 20 نتيجة، الترتيب حسب الدرجة، وعند التساوي يتقدم الأسرع وقتًا</p>
+  </section>
+
+  <div id="lb-list"></div>
+</main>
+
+<footer class="site">أكاديمية أبو كامل — محتوى تعليمي للمعهد الفني الصناعي</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="content-data.js"></script>
+<script src="leaderboard.js"></script>
+<script>
+lbLoad();
+</script>
+</body>
+</html>

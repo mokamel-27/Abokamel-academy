@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>الدرس | أكاديمية أبو كامل</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-protected>
+
+<header class="site">
+  <div class="brand">أكاديمية <span>أبو كامل</span></div>
+  <nav class="site">
+    <a href="index.html">الرئيسية</a>
+    <a id="back-to-subject" href="#">المادة</a>
+    <span id="nav-user" style="display:none;font-family:'IBM Plex Mono',monospace;font-size:.8rem;color:#d98e2b;"></span>
+    <a href="#" id="nav-logout" onclick="logout()" style="display:none">خروج</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <h1 id="lesson-title">—</h1>
+  </section>
+
+  <article class="lesson" id="lesson-content"></article>
+
+  <section style="margin:30px 0;padding:20px;background:#fff;border:1px solid #d8d2c0">
+    <h2 style="font-size:1.05rem;margin-bottom:10px">فيديو شرح الدرس</h2>
+    <a id="video-link" href="#" target="_blank" rel="noopener" class="switch-link-btn">شاهد شرح الدرس على يوتيوب ←</a>
+    <p style="color:#5b6b64;font-size:.82rem;margin-top:8px">الرابط بيفتحلك نتائج بحث يوتيوب عن موضوع الدرس، اختار الفيديو اللي يناسبك.</p>
+  </section>
+
+  <section style="display:flex;gap:16px;flex-wrap:wrap;margin-top:20px">
+    <a id="lesson-quiz-link" class="switch-link-btn" href="#">ابدأ امتحان الدرس ←</a>
+    <a id="chapter-quiz-link" class="switch-link-btn" href="#">ابدأ امتحان الباب ←</a>
+    <a id="lesson-lb-link" class="switch-link-btn" href="#">ترتيب امتحان الدرس ←</a>
+  </section>
+</main>
+
+<footer class="site">أكاديمية أبو كامل — محتوى تعليمي للمعهد الفني الصناعي</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="content-data.js"></script>
+<script>
+const params = new URLSearchParams(window.location.search);
+const subjectId = params.get("subject");
+const chapterId = params.get("chapter");
+const chapter = getChapter(subjectId, chapterId);
+
+if (chapter) {
+  document.getElementById("lesson-title").textContent = "الباب " + chapter.id + ": " + chapter.title;
+  document.getElementById("lesson-content").innerHTML = chapter.content;
+  document.getElementById("video-link").href = "https://www.youtube.com/results?search_query=" + encodeURIComponent(chapter.videoSearch);
+  document.getElementById("back-to-subject").href = "subject.html?subject=" + subjectId;
+  document.getElementById("lesson-quiz-link").href = "quiz.html?subject=" + subjectId + "&chapter=" + chapter.id + "&type=lesson";
+  document.getElementById("chapter-quiz-link").href = "quiz.html?subject=" + subjectId + "&chapter=" + chapter.id + "&type=chapter";
+  document.getElementById("lesson-lb-link").href = "leaderboard.html?subject=" + subjectId + "&chapter=" + chapter.id + "&type=lesson";
+} else {
+  document.getElementById("lesson-title").textContent = "الدرس غير موجود";
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>أبواب المادة | أكاديمية أبو كامل</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site">
+  <div class="brand">أكاديمية <span>أبو كامل</span></div>
+  <nav class="site">
+    <a href="index.html">الرئيسية</a>
+    <span id="nav-user" style="display:none;font-family:'IBM Plex Mono',monospace;font-size:.8rem;color:#d98e2b;"></span>
+    <a href="#" id="nav-logout" onclick="logout()" style="display:none">خروج</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <h1 id="subject-title">—</h1>
+    <p id="subject-desc"></p>
+  </section>
+
+  <div id="chapters-list" class="grid"></div>
+
+  <section style="margin-top:40px;border-top:1px solid #d8d2c0;padding-top:24px">
+    <h2 style="font-size:1.1rem;margin-bottom:10px">الامتحان الشامل</h2>
+    <p style="color:#5b6b64;font-size:.95rem;margin-bottom:14px">امتحان يجمع أسئلة من كل أبواب المادة</p>
+    <a id="final-exam-link" class="switch-link-btn" href="#">ابدأ الامتحان الشامل ←</a>
+    <a id="final-lb-link" class="switch-link-btn" href="#" style="margin-inline-start:16px">شوف الترتيب الشامل ←</a>
+  </section>
+</main>
+
+<footer class="site">أكاديمية أبو كامل — محتوى تعليمي للمعهد الفني الصناعي</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="content-data.js"></script>
+<script>
+const subjectId = new URLSearchParams(window.location.search).get("subject") || "vb6";
+const subject = getSubject(subjectId);
+
+if (subject) {
+  document.getElementById("subject-title").textContent = subject.title;
+  document.getElementById("subject-desc").textContent = subject.description;
+  document.getElementById("final-exam-link").href = "quiz.html?subject=" + subjectId + "&type=final";
+  document.getElementById("final-lb-link").href = "leaderboard.html?subject=" + subjectId + "&type=final";
+
+  const list = document.getElementById("chapters-list");
+  subject.chapters.forEach(function (ch) {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <h3>الباب ${ch.id}: ${ch.title}</h3>
+      <p>شرح الدرس + امتحان الدرس + امتحان الباب + فيديو شرح</p>
+      <a href="lesson.html?subject=${subjectId}&chapter=${ch.id}">ادخل الدرس ←</a><br>
+      <a href="leaderboard.html?subject=${subjectId}&chapter=${ch.id}&type=chapter">ترتيب امتحان الباب ←</a>
+    `;
+    list.appendChild(card);
+  });
+} else {
+  document.getElementById("subject-title").textContent = "المادة غير موجودة";
+}
+</script>
+</body>
+</html>
