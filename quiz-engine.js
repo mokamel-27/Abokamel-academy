@@ -98,16 +98,21 @@ function qzSubmit(e) {
     <a class="switch-link-btn" href="leaderboard.html?subject=${QZ_subjectId}&chapter=${QZ_chapterId || ""}&type=${QZ_type}">شوف ترتيب المتسابقين ←</a>
   `;
 
-  db.collection("attempts").add({
-    uid: user.uid,
-    email: user.email,
-    subjectId: QZ_subjectId,
-    chapterId: QZ_type === "final" ? null : Number(QZ_chapterId),
-    type: QZ_type,
-    score: score,
-    total: total,
-    durationSeconds: durationSeconds,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  db.collection("students").doc(user.uid).get().then(function (doc) {
+    const profile = doc.exists ? doc.data() : {};
+    return db.collection("attempts").add({
+      uid: user.uid,
+      email: user.email,
+      displayName: profile.displayName || user.email.split("@")[0],
+      avatar: profile.avatar || "🧑‍🎓",
+      subjectId: QZ_subjectId,
+      chapterId: QZ_type === "final" ? null : Number(QZ_chapterId),
+      type: QZ_type,
+      score: score,
+      total: total,
+      durationSeconds: durationSeconds,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
   }).catch(function (err) {
     console.error("تعذر حفظ النتيجة:", err);
   });

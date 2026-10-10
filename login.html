@@ -94,6 +94,8 @@ form.addEventListener("submit", function (e) {
         // نخزن بيانات أساسية للطالب في Firestore
         return db.collection("students").doc(cred.user.uid).set({
           email: email,
+          displayName: email.split("@")[0],
+          avatar: "🧑‍🎓",
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
       }

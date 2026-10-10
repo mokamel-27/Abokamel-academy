@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>الترتيب | أكاديمية أبو كامل</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-protected>
+
+<header class="site">
+  <div class="brand">أكاديمية <span>أبو كامل</span></div>
+  <nav class="site">
+    <a href="index.html">الرئيسية</a>
+    <a href="ranking.html" id="nav-ranking">الترتيب</a>
+    <span class="avatar-badge" id="nav-avatar-badge" style="display:none"></span>
+    <span id="nav-user" style="display:none;font-family:'IBM Plex Mono',monospace;font-size:.82rem;color:var(--amber);margin-inline-start:8px;"></span>
+    <a href="profile.html" id="nav-profile">حسابي</a>
+    <a href="#" id="nav-logout" onclick="logout()">خروج</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <h1>لوحة الترتيب</h1>
+    <p>شوف ترتيبك وترتيب زمايلك في أي امتحان — اختار المادة والباب والنوع</p>
+  </section>
+
+  <div class="rank-filters">
+    <div class="field">
+      <label for="f-subject">المادة</label>
+      <select id="f-subject"></select>
+    </div>
+    <div class="field">
+      <label for="f-type">نوع الترتيب</label>
+      <select id="f-type">
+        <option value="final">الامتحان الشامل</option>
+        <option value="chapter">امتحان باب</option>
+        <option value="lesson">امتحان درس</option>
+      </select>
+    </div>
+    <div class="field" id="chapter-field">
+      <label for="f-chapter">الباب</label>
+      <select id="f-chapter"></select>
+    </div>
+  </div>
+
+  <h2 id="lb-title" style="font-size:1.1rem;margin-bottom:12px">—</h2>
+  <div id="lb-list"></div>
+</main>
+
+<footer class="site">أكاديمية أبو كامل — محتوى تعليمي للمعهد الفني الصناعي</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="content-data.js"></script>
+<script src="leaderboard.js"></script>
+<script>
+const subjectSelect = document.getElementById("f-subject");
+const typeSelect = document.getElementById("f-type");
+const chapterSelect = document.getElementById("f-chapter");
+const chapterField = document.getElementById("chapter-field");
+
+function fillSubjects() {
+  SUBJECTS.forEach(function (s) {
+    const opt = document.createElement("option");
+    opt.value = s.id;
+    opt.textContent = s.title;
+    subjectSelect.appendChild(opt);
+  });
+}
+
+function fillChapters() {
+  const subject = getSubject(subjectSelect.value);
+  chapterSelect.innerHTML = "";
+  if (!subject) return;
+  subject.chapters.forEach(function (ch) {
+    const opt = document.createElement("option");
+    opt.value = ch.id;
+    opt.textContent = "الباب " + ch.id + ": " + ch.title;
+    chapterSelect.appendChild(opt);
+  });
+}
+
+function refresh() {
+  const subjectId = subjectSelect.value;
+  const type = typeSelect.value;
+  const chapterId = chapterSelect.value;
+
+  chapterField.style.display = (type === "final") ? "none" : "flex";
+
+  document.getElementById("lb-title").textContent = lbTitle(subjectId, chapterId, type);
+  lbRender(subjectId, chapterId, type, "lb-list");
+}
+
+fillSubjects();
+fillChapters();
+refresh();
+
+subjectSelect.addEventListener("change", function () { fillChapters(); refresh(); });
+typeSelect.addEventListener("change", refresh);
+chapterSelect.addEventListener("change", refresh);
+</script>
+</body>
+</html>

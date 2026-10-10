@@ -1,5 +1,5 @@
 // =========================================================================
-// محرك لوحة الترتيب - يُستخدم في leaderboard.html
+// محرك لوحة الترتيب - يُستخدم في leaderboard.html و ranking.html
 // =========================================================================
 
 function lbGetParam(name) {
@@ -14,12 +14,10 @@ function lbTitle(subjectId, chapterId, type) {
   return (type === "lesson" ? "ترتيب امتحان الدرس: " : "ترتيب امتحان الباب: ") + chapter.title;
 }
 
-function lbLoad() {
-  const subjectId = lbGetParam("subject");
-  const chapterId = lbGetParam("chapter");
-  const type = lbGetParam("type");
-
-  document.getElementById("lb-title").textContent = lbTitle(subjectId, chapterId, type);
+// الدالة الأساسية: بتجيب النتائج وتعرضها جوه أي عنصر تحدده (targetId)
+function lbRender(subjectId, chapterId, type, targetId) {
+  const listEl = document.getElementById(targetId);
+  listEl.innerHTML = "<p>بنجيب النتايج...</p>";
 
   let query = db.collection("attempts")
     .where("subjectId", "==", subjectId)
@@ -31,16 +29,12 @@ function lbLoad() {
 
   query = query.orderBy("score", "desc").limit(100);
 
-  const listEl = document.getElementById("lb-list");
-  listEl.innerHTML = "<p>بنجيب النتايج...</p>";
-
   query.get().then(function (snapshot) {
     let rows = [];
     snapshot.forEach(function (doc) {
       rows.push(doc.data());
     });
 
-    // ترتيب إضافي: عند تساوي الدرجة، الأسرع في الوقت يتقدم
     rows.sort(function (a, b) {
       if (b.score !== a.score) return b.score - a.score;
       return a.durationSeconds - b.durationSeconds;
@@ -58,10 +52,11 @@ function lbLoad() {
     </tr></thead><tbody>`;
 
     rows.forEach(function (r, i) {
-      const name = r.email ? r.email.split("@")[0] : "طالب";
+      const name = r.displayName || (r.email ? r.email.split("@")[0] : "طالب");
+      const avatar = r.avatar || "🧑‍🎓";
       html += `<tr${i < 3 ? ' class="lb-top"' : ''}>
         <td>${i + 1}</td>
-        <td>${name}</td>
+        <td><span class="lb-who"><span class="lb-avatar">${avatar}</span> ${name}</span></td>
         <td>${r.score}/${r.total}</td>
         <td>${r.durationSeconds} ث</td>
       </tr>`;
@@ -73,4 +68,13 @@ function lbLoad() {
     console.error(err);
     listEl.innerHTML = "<p>حصل خطأ في تحميل الترتيب. لو ده أول مرة، ممكن Firestore يحتاج إنشاء index — افتح الـ console (F12) هتلاقي رابط لإنشائه تلقائيًا.</p>";
   });
+}
+
+// يُستخدم في leaderboard.html - بيقرأ الباراميترز من رابط الصفحة
+function lbLoad() {
+  const subjectId = lbGetParam("subject");
+  const chapterId = lbGetParam("chapter");
+  const type = lbGetParam("type");
+  document.getElementById("lb-title").textContent = lbTitle(subjectId, chapterId, type);
+  lbRender(subjectId, chapterId, type, "lb-list");
 }
