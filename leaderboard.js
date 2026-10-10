@@ -21,7 +21,8 @@ function lbRender(subjectId, chapterId, type, targetId) {
   if (type === "lesson" || type === "chapter") {
     query = query.where("chapterId", "==", Number(chapterId));
   }
-  query = query.orderBy("score", "desc").limit(300);
+  // بدون orderBy عشان ما نحتاجش index في Firestore، والترتيب بيتعمل تحت
+  query = query.limit(500);
 
   query.get().then(function (snapshot) {
     const best = {};
