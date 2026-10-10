@@ -17,6 +17,12 @@ const db = firebase.firestore();
 
 const DEFAULT_AVATAR = "🧑‍🎓";
 
+// الصورة ممكن تكون إيموجي أو صورة مرفوعة (data:image)
+function avatarHtml(a) {
+  a = a || DEFAULT_AVATAR;
+  return a.indexOf("data:image") === 0 ? '<img src="' + a + '" alt="">' : a;
+}
+
 // تتحقق من حالة تسجيل الدخول في أي صفحة وتحدّث شكل الـ nav
 auth.onAuthStateChanged(function (user) {
   const loginLink = document.getElementById("nav-login");
@@ -37,7 +43,7 @@ auth.onAuthStateChanged(function (user) {
       const name = data.displayName || user.email.split("@")[0];
       const avatar = data.avatar || DEFAULT_AVATAR;
       if (userLabel) { userLabel.style.display = "inline"; userLabel.textContent = name; }
-      if (avatarBadge) { avatarBadge.style.display = "inline-flex"; avatarBadge.textContent = avatar; }
+      if (avatarBadge) { avatarBadge.style.display = "inline-flex"; avatarBadge.innerHTML = avatarHtml(avatar); }
     });
   } else {
     if (loginLink) loginLink.style.display = "inline";

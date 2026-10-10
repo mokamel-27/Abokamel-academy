@@ -28,6 +28,8 @@
   </section>
 
   <div id="chapters-list" class="grid"></div>
+  <h2 style="font-size:1.2rem;margin-top:36px">امتحانات المراحل</h2>
+  <div id="parts-exams" class="grid"></div>
 
   <section style="margin-top:40px;border-top:1px solid #d8d2c0;padding-top:24px">
     <h2 style="font-size:1.1rem;margin-bottom:10px">الامتحان الشامل</h2>
@@ -54,6 +56,16 @@ if (subject) {
   document.getElementById("final-exam-link").href = "quiz.html?subject=" + subjectId + "&type=final";
   document.getElementById("final-lb-link").href = "leaderboard.html?subject=" + subjectId + "&type=final";
 
+  const parts = document.getElementById("parts-exams");
+  [["part1", "امتحان الأبواب 1 إلى 5"], ["part2", "امتحان الأبواب 6 إلى 10"]].forEach(function (p) {
+    if (p[0] === "part2" && subject.chapters.length <= 5) return;
+    const c = document.createElement("div");
+    c.className = "card";
+    c.innerHTML = "<h3>" + p[1] + "</h3><p>أسئلة مجمّعة من أبواب المرحلة</p>" +
+      '<a href="quiz.html?subject=' + subjectId + "&type=" + p[0] + '">ابدأ الامتحان ←</a><br>' +
+      '<a href="leaderboard.html?subject=' + subjectId + "&type=" + p[0] + '">الترتيب ←</a>';
+    parts.appendChild(c);
+  });
   const list = document.getElementById("chapters-list");
   subject.chapters.forEach(function (ch) {
     const card = document.createElement("div");

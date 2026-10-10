@@ -36,6 +36,8 @@
       <label for="f-type">نوع الترتيب</label>
       <select id="f-type">
         <option value="final">الامتحان الشامل</option>
+        <option value="part1">امتحان الأبواب 1 إلى 5</option>
+        <option value="part2">امتحان الأبواب 6 إلى 10</option>
         <option value="chapter">امتحان باب</option>
         <option value="lesson">امتحان درس</option>
       </select>
@@ -90,7 +92,7 @@ function refresh() {
   const type = typeSelect.value;
   const chapterId = chapterSelect.value;
 
-  chapterField.style.display = (type === "final") ? "none" : "flex";
+  chapterField.style.display = (type === "lesson" || type === "chapter") ? "flex" : "none";
 
   document.getElementById("lb-title").textContent = lbTitle(subjectId, chapterId, type);
   lbRender(subjectId, chapterId, type, "lb-list");

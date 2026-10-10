@@ -22,6 +22,14 @@ function qzLoadQuestions() {
   if (QZ_type === "final") {
     return buildFinalExam(QZ_subjectId);
   }
+  if (QZ_type === "part1" || QZ_type === "part2") {
+    const chs = QZ_type === "part1" ? subject.chapters.slice(0, 5) : subject.chapters.slice(5);
+    let qs = [];
+    chs.forEach(function (ch) {
+      qs = qs.concat(ch.chapterQuiz.slice(0, 4));
+    });
+    return qs;
+  }
   const chapter = getChapter(QZ_subjectId, QZ_chapterId);
   if (!chapter) return [];
   return QZ_type === "lesson" ? chapter.lessonQuiz : chapter.chapterQuiz;
@@ -30,6 +38,8 @@ function qzLoadQuestions() {
 function qzTitle() {
   const subject = getSubject(QZ_subjectId);
   if (QZ_type === "final") return "الامتحان الشامل - " + (subject ? subject.title : "");
+  if (QZ_type === "part1") return "امتحان الأبواب 1 إلى 5";
+  if (QZ_type === "part2") return "امتحان الأبواب 6 إلى 10";
   const chapter = getChapter(QZ_subjectId, QZ_chapterId);
   if (!chapter) return "امتحان";
   return (QZ_type === "lesson" ? "امتحان الدرس: " : "امتحان الباب: ") + chapter.title;
@@ -104,9 +114,9 @@ function qzSubmit(e) {
       uid: user.uid,
       email: user.email,
       displayName: profile.displayName || user.email.split("@")[0],
-      avatar: profile.avatar || "🧑‍🎓",
+      avatar: profile.avatar || DEFAULT_AVATAR,
       subjectId: QZ_subjectId,
-      chapterId: QZ_type === "final" ? null : Number(QZ_chapterId),
+      chapterId: (QZ_type === "lesson" || QZ_type === "chapter") ? Number(QZ_chapterId) : null,
       type: QZ_type,
       score: score,
       total: total,

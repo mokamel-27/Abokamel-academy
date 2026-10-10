@@ -32,7 +32,9 @@
     <label for="display-name">الاسم الظاهر</label>
     <input type="text" id="display-name" maxlength="30" placeholder="اكتب اسمك">
 
-    <label style="margin-top:22px">اختر صورة البروفايل</label>
+    <label style="margin-top:22px">ارفع صورتك من جهازك</label>
+    <input type="file" id="photo-input" accept="image/*">
+    <label>أو اختر رمز</label>
     <div class="avatar-grid" id="avatar-grid"></div>
 
     <button class="primary" id="save-btn">حفظ التغييرات</button>
@@ -67,12 +69,28 @@ function renderAvatarGrid() {
   });
 }
 
+document.getElementById("photo-input").addEventListener("change", function (e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const img = new Image();
+  img.onload = function () {
+    const c = document.createElement("canvas");
+    c.width = c.height = 128;
+    const s = Math.min(img.width, img.height);
+    c.getContext("2d").drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, 128, 128);
+    selectedAvatar = c.toDataURL("image/jpeg", 0.8);
+    document.getElementById("current-avatar").innerHTML = avatarHtml(selectedAvatar);
+    renderAvatarGrid();
+  };
+  img.src = URL.createObjectURL(file);
+});
+
 auth.onAuthStateChanged(function (user) {
   if (!user) return;
   db.collection("students").doc(user.uid).get().then(function (doc) {
     const data = doc.exists ? doc.data() : {};
     selectedAvatar = data.avatar || AVATARS[0];
-    document.getElementById("current-avatar").textContent = selectedAvatar;
+    document.getElementById("current-avatar").innerHTML = avatarHtml(selectedAvatar);
     document.getElementById("display-name").value = data.displayName || user.email.split("@")[0];
     renderAvatarGrid();
   });
